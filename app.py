@@ -1,36 +1,37 @@
-# -*- coding: utf-8 -*-
 import streamlit as st
 from groq import Groq
 
-# Forzamos a que Streamlit no use caracteres raros en la interfaz
-st.set_page_config(page_title="Didi AI")
 st.title("Didi: Tu Amigo Digital")
 
-client = Groq(api_key=st.secrets["GROQ_API_KEY"])
+# Intentamos conectar con la llave
+try:
+    client = Groq(api_key=st.secrets["GROQ_API_KEY"])
+except:
+    st.error("Falta la llave en Secrets")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+for m in st.session_state.messages:
+    with st.chat_message(m["role"]):
+        st.write(m["content"])
 
-if prompt := st.chat_input("Que pasa Salchipapa?"):
-    st.session_state.messages.append({"role": "user", "content": prompt})
+if p := st.chat_input("Que pasa Salchipapa?"):
+    st.session_state.messages.append({"role": "user", "content": p})
     with st.chat_message("user"):
-        st.markdown(prompt)
+        st.write(p)
 
     with st.chat_message("assistant"):
         try:
-            completion = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[
-                    {"role": "system", "content": "Tu nombre es Didi. Eres el mejor amigo de Edward, apodado Salchipapa. Habla siempre sin usar tildes ni enies."},
-                    {"role": "user", "content": prompt}
-                ],
+            # Usamos el modelo mas rapido y sencillo
+            c = client.chat.completions.create(
+                model="llama3-8b-8192",
+                messages=[{"role": "system", "content": "Eres Didi, amigo de Edward (Salchipapa). No uses tildes."},
+                          {"role": "user", "content": p}]
             )
-            response = completion.choices[0].message.content
-            st.markdown(response)
-            st.session_state.messages.append({"role": "assistant", "content": response})
-        except Exception as e:
-            st.error("Didi esta descansando un momento, intenta de nuevo.")
+            r = c.choices[0].message.content
+            st.write(r)
+            st.session_state.messages.append({"role": "assistant", "content": r})
+        except:
+            st.error("Error de conexion. Revisa tu llave de Groq.")
+            
