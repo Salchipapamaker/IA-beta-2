@@ -1,11 +1,11 @@
 import streamlit as st
 from groq import Groq
 
-# Configuración de la página
+# Configuracion de la pagina (sin tildes para evitar errores)
 st.set_page_config(page_title="Didi AI", page_icon="🤖")
-st.title("🤖 Didi: Mi Compañero Digital")
+st.title("🤖 Didi: Mi Companero Digital")
 
-# Aquí va tu llave (API KEY)
+# Aqui va tu llave (API KEY)
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
 if "messages" not in st.session_state:
@@ -15,21 +15,21 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if prompt := st.chat_input("¿Qué pasa, Gerson?"):
+if prompt := st.chat_input("Dime algo, Salchipapa"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        # USAMOS EL MODELO NUEVO: llama-3.3-70b-versatile
+        # Usamos el modelo mas potente y nuevo
         completion = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
-                {"role": "system", "content": "Eres Didi, una IA con mucha calle, amigable, hablas de tú a tú y eres el mejor amigo de Gerson."},
+                {"role": "system", "content": "Eres Didi, una IA con mucha calle, amigable y hablas de tu a tu. Tu creador y mejor amigo es Edward, pero siempre le dices Salchipapa de carino. No uses tildes ni enies en tus respuestas para evitar errores de sistema por ahora."},
                 {"role": "user", "content": prompt}
             ],
         )
         response = completion.choices[0].message.content
         st.markdown(response)
     st.session_state.messages.append({"role": "assistant", "content": response})
-  
+
