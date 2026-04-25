@@ -4,7 +4,6 @@ from groq import Groq
 st.set_page_config(page_title="Didi Final")
 st.title("Didi: Salchipapa")
 
-# Cargamos la conexion una sola vez
 try:
     client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 except Exception as e:
@@ -24,15 +23,14 @@ if p := st.chat_input("Dime algo, Salchipapa"):
 
     with st.chat_message("assistant"):
         try:
-            # Quitamos los 'system messages' complejos que pueden dar error
+            # USAMOS EL MODELO NUEVO (Llama 3.1)
             response = client.chat.completions.create(
-                model="llama3-8b-8192",
+                model="llama-3.1-8b-instant",
                 messages=[{"role": "user", "content": p}]
             )
             r_text = response.choices[0].message.content
             st.write(r_text)
             st.session_state.messages.append({"role": "assistant", "content": r_text})
         except Exception as e:
-            # Aqui nos va a decir la verdad de por que no funciona
             st.error(f"Fallo tecnico: {e}")
             
