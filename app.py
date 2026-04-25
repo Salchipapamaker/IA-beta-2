@@ -24,7 +24,7 @@ if p := st.chat_input("Habla, Salchipapa"):
     try:
         # Estructura limpia para evitar el BadRequestError
         chat_completion = client.chat.completions.create(
-            model="llama3-8b-8192",
+            model="mixtral-8x7b-32768",
             messages=[
                 {"role": "system", "content": "Eres Didi, el mejor amigo de Edward (Salchipapa). Habla con mucha calle pero sin tildes."},
                 {"role": "user", "content": p}
