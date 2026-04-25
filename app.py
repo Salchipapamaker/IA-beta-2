@@ -1,44 +1,38 @@
 import streamlit as st
 from groq import Groq
 
-# 1. Configuracion de la pagina
-st.set_page_config(page_title="Didi AI", page_icon="🤖")
-st.title("Didi: El Regreso")
+st.set_page_config(page_title="Didi Final")
+st.title("Didi: Salchipapa")
 
-# 2. Conexion con la llave de forma segura
-if "GROQ_API_KEY" in st.secrets:
+# Cargamos la conexion una sola vez
+try:
     client = Groq(api_key=st.secrets["GROQ_API_KEY"])
-else:
-    st.error("Falta la llave en los Secrets de Streamlit")
-    st.stop()
+except Exception as e:
+    st.error(f"Error de configuracion: {e}")
 
-# 3. Historial de mensajes
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
 for m in st.session_state.messages:
     with st.chat_message(m["role"]):
-        st.markdown(m["content"])
+        st.write(m["content"])
 
-# 4. Chat
-if prompt := st.chat_input("Habla, Salchipapa"):
-    st.session_state.messages.append({"role": "user", "content": prompt})
+if p := st.chat_input("Dime algo, Salchipapa"):
+    st.session_state.messages.append({"role": "user", "content": p})
     with st.chat_message("user"):
-        st.markdown(prompt)
+        st.write(p)
 
     with st.chat_message("assistant"):
         try:
-            # Usamos el modelo Llama 3 que es super rapido
-            completion = client.chat.completions.create(
+            # Quitamos los 'system messages' complejos que pueden dar error
+            response = client.chat.completions.create(
                 model="llama3-8b-8192",
-                messages=[
-                    {"role": "system", "content": "Eres Didi, el mejor amigo de Edward (Salchipapa). Habla corto y sin tildes."},
-                    {"role": "user", "content": prompt}
-                ]
+                messages=[{"role": "user", "content": p}]
             )
-            response = completion.choices[0].message.content
-            st.markdown(response)
-            st.session_state.messages.append({"role": "assistant", "content": response})
+            r_text = response.choices[0].message.content
+            st.write(r_text)
+            st.session_state.messages.append({"role": "assistant", "content": r_text})
         except Exception as e:
-            st.error("Didi se distrajo, intenta preguntar de nuevo.")
+            # Aqui nos va a decir la verdad de por que no funciona
+            st.error(f"Fallo tecnico: {e}")
             
